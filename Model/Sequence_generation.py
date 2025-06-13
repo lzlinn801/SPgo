@@ -4,6 +4,8 @@ from transformers import BertModel, BertTokenizer
 import random
 import numpy as np
 import logging
+import os
+import subprocess
 
 os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 
@@ -103,7 +105,6 @@ class LSTMModel(nn.Module):
                 batch_input_ids = input_ids[start_idx:end_idx]
                 batch_attention_mask = attention_mask[start_idx:end_idx]
 
-                # 一次性获取BERT输出
                 model_outputs = self.protein_bert(input_ids=batch_input_ids, attention_mask=batch_attention_mask)
                 last_hidden_state = model_outputs.last_hidden_state
 
@@ -136,20 +137,24 @@ def c_sequence():
             return ''.join(sequence)
 
 
-def n_sequence():
+def n_sequence_v2(length=5):
     sequence = ['M']
+    remaining = length - 1
 
-    num_positive = np.random.randint(2, 4)
+    num_positive = np.random.randint(2, min(remaining, 4))  # 控制范围合理
     sequence += np.random.choice(positive_amino_acids, num_positive, replace=True).tolist()
+    remaining -= num_positive
 
-    while len(sequence) < 5:
-        sequence.append(np.random.choice(neutral_amino_acids))
+    if remaining > 0:
+        sequence += np.random.choice(neutral_amino_acids, remaining, replace=True).tolist()
 
+    random.shuffle(sequence[1:])
     return ''.join(sequence)
 
 
 def calculate_hydrophobicity(sequence):
     return sum(hydrophobicity.get(aa, 0) for aa in sequence)
+
 
 def run_signalp(input_file, output_file):
     try:
@@ -168,32 +173,27 @@ def run_signalp(input_file, output_file):
     except subprocess.CalledProcessError as e:
         print(f"Error running SignalP: {e}")
 
+
 if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model_path ='bert-base-uncased'
     tokenizer = BertTokenizer.from_pretrained(model_path)
 
-    # 加载训练好的模型
     model = LSTMModel(model_path=model_path).to(device)
     model.load_state_dict(torch.load("checkpoint.pt", weights_only=True))
 
-    # 数据加载：加载FASTA文件
-    input_ids, attention_mask = load_fasta('dataset.fasta', tokenizer)
+    input_ids, attention_mask = load_fasta('data/dataset.fasta', tokenizer)
 
-    # 生成序列
     generated_sequence = model.generate_sequence(input_ids, attention_mask, top_k=20, top_p=0.9)
 
-    # 解码生成的序列
     decoded_sequences = [tokenizer.decode(seq, skip_special_tokens=True).upper() for seq in generated_sequence]
 
-    # 只保留标准20种氨基酸
     valid_amino_acids = set(hydrophobicity.keys())
     filtered_sequences = []
     for seq in decoded_sequences:
         clean_seq = ''.join([aa for aa in seq if aa in valid_amino_acids])
         filtered_sequences.append(clean_seq)
 
-    # 保存序列
     target_sequence = input("Target protein：").upper()
     output_file = 'result-seq.fasta'
     with open(output_file, 'w', encoding='utf-8') as f:
@@ -201,7 +201,7 @@ if __name__ == "__main__":
             csequences = c_sequence()
             nsequences = n_sequence()
 
-            f.write(f">seq{i + 1}\n{nsequences}{seq}{csequences}{target_sequence}\n")
+            f.write(f">generated_signal_peptide_{i + 1}\n{nsequences}{seq}{csequences}{target_sequence}\n")
 
     logging.info(f"Generated sequences saved to {output_file}")
     input_file = "result-seq.fasta"
