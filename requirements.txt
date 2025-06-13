@@ -1,0 +1,5 @@
+torch>=1.10.0
+transformers>=4.28.0
+scikit-learn
+numpy
+tqdm
