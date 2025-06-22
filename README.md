@@ -97,3 +97,4 @@ MRRLLALALALALAAQAFA...
 - Devlin et al., BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding. [arXiv:1810.04805](https://arxiv.org/abs/1810.04805)
 - Nielsen, H., et al. SignalP: Signal peptide prediction using neural networks. *Protein Engineering* (1997).
 - Teufel et al., SignalP 6.0 predicts all five types of signal peptides using protein language models. *Nature Biotechnology* (2022).
+- For a video of SPgo in action, see https://drive.google.com/file/d/1iWw7QOF2OZsCTW5z7DuvZxUGYm-hJgp7/view?usp=sharing
