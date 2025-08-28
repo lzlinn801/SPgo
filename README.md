@@ -78,7 +78,7 @@ SPgo/
 │   ├── training.py               # Model definition and training script
 │   └── Sequence_generation.py    # Sequence generation script
 ├── data/                         # Input FASTA files
-├── checkpoints/                  # Trained model weights
+├── checkpoints/                  # Trained model weights (The checkpoint file can be downloaded at https://drive.google.com/file/d/1ElvvCBtIcbXLl4MakJ6_VIGdzHD1nV6W)
 ├── requirements.txt              # Required Python packages
 └── README.md
 ```
