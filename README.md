@@ -98,3 +98,4 @@ MRRLLALALALALAAQAFA...
 - Nielsen, H., et al. SignalP: Signal peptide prediction using neural networks. *Protein Engineering* (1997).
 - Teufel et al., SignalP 6.0 predicts all five types of signal peptides using protein language models. *Nature Biotechnology* (2022).
 - For a video of SPgo in action, see https://drive.google.com/file/d/1iWw7QOF2OZsCTW5z7DuvZxUGYm-hJgp7/view?usp=sharing
+- This tool is now published in the paper **https://pubs.acs.org/doi/10.1021/jacsau.5c00757**
